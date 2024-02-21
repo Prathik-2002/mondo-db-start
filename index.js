@@ -9,7 +9,7 @@ const addNewBook = async (Library, book) => {
     await Library.insertOne(book);
     console.log('Added book');
   } catch (err) {
-    console.log('Unable to insert', err);
+    console.log('Unable to insert');
   }
 };
 const getBookByAuthor = async (Library, authorName) => {
@@ -27,16 +27,24 @@ const getBookByAuthor = async (Library, authorName) => {
 };
 const displayAllBooks = async (Library) => {
   try {
-    const books = await Library.find({}, {_id: 0});
+    const books = await Library.find({});
     return await books.toArray();
   } catch (err) {
     console.log('Unable to display books');
   }
 };
+const ChangeBookPublicationById = async (Library, id, newPublication) => {
+  try {
+    await Library.updateMany({bookId: id}, {$set: {publication: newPublication}});
+    console.log(`Book ${id} Publication changed to ${newPublication}`);
+  } catch (err) {
+    console.log('Unable to Change publication');
+  }
+};
 const IncrementBookAgeById = async (Library, id) => {
   try {
     await Library.updateMany({bookId: id}, {$inc: {age: 1}});
-    console.log('Updated');
+    console.log(`Book ${id} age incremented`);
   } catch (err) {
     console.log('Unable to update age');
   }
@@ -53,7 +61,7 @@ const getBookCountByBookName = async (Library, bookName) => {
 const deleteBookById = async (Library, bookId) => {
   try {
     await Library.deleteMany({bookId: bookId});
-    console.log('Book deleted successfully');
+    console.log(`Book ${bookId} deleted successfully`);
   } catch (err) {
     console.log('Unable to delete book');
   }
@@ -70,7 +78,7 @@ async function start() {
     const Library = database.collection(collectionName);
     Library.createIndex({bookId: 1}, {unique: true});
     await addNewBook(Library, {
-      bookId: 121,
+      bookId: 1216,
       bookName: 'The Jungle Book',
       author: 'Rudyard Kipling',
       pageCount: '409',
@@ -79,7 +87,7 @@ async function start() {
       age: 3,
     });
     await addNewBook(Library, {
-      bookId: 321,
+      bookId: 3213,
       bookName: 'The Jungle Book',
       author: 'Rudyard Kipling',
       pageCount: '409',
@@ -88,7 +96,7 @@ async function start() {
       age: 3,
     });
     await addNewBook(Library, {
-      bookId: 562,
+      bookId: 5623,
       bookName: 'Pennywise',
       author: 'Stephan King',
       pageCount: '890',
@@ -114,12 +122,17 @@ async function start() {
       publication: 'Simon & Schuster',
       age: 1,
     });
+    console.table(await displayAllBooks(Library));
+
+    console.log('\nJane Austen Books: ');
     await getBookByAuthor(Library, 'Jane Austen');
     const noOfbooks = await getBookCountByBookName(Library, 'The Jungle Book');
-    console.log('The jungle Book count is: ' + noOfbooks);
-    console.table(await displayAllBooks(Library));
+    console.log('\nThe jungle Book count is: ' + noOfbooks);
     await deleteBookById(Library, 2323);
+    console.table(await displayAllBooks(Library));
     await IncrementBookAgeById(Library, 8344);
+    console.table(await displayAllBooks(Library));
+    await ChangeBookPublicationById(Library, 8344, 'Jack Smith');
     console.table(await displayAllBooks(Library));
   } catch (e) {
     console.log(e);
