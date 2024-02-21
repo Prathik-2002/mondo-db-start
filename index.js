@@ -12,6 +12,7 @@ const addNewBook = async (Library, book) => {
     console.log('Unable to insert');
   }
 };
+
 const getBookByAuthor = async (Library, authorName) => {
   try {
     const books = await Library.find({author: authorName});
@@ -25,6 +26,7 @@ const getBookByAuthor = async (Library, authorName) => {
     console.log('Unable to find books');
   }
 };
+
 const displayAllBooks = async (Library) => {
   try {
     const books = await Library.find({});
@@ -33,6 +35,7 @@ const displayAllBooks = async (Library) => {
     console.log('Unable to display books');
   }
 };
+
 const ChangeBookPublicationById = async (Library, id, newPublication) => {
   try {
     await Library.updateMany({bookId: id}, {$set: {publication: newPublication}});
@@ -41,6 +44,7 @@ const ChangeBookPublicationById = async (Library, id, newPublication) => {
     console.log('Unable to Change publication');
   }
 };
+
 const IncrementBookAgeById = async (Library, id) => {
   try {
     await Library.updateMany({bookId: id}, {$inc: {age: 1}});
@@ -49,6 +53,7 @@ const IncrementBookAgeById = async (Library, id) => {
     console.log('Unable to update age');
   }
 };
+
 const getBookCountByBookName = async (Library, bookName) => {
   try {
     const books = await Library.find({bookName: bookName});
@@ -58,6 +63,7 @@ const getBookCountByBookName = async (Library, bookName) => {
     console.log('Unable to count books');
   }
 };
+
 const deleteBookById = async (Library, bookId) => {
   try {
     await Library.deleteMany({bookId: bookId});
@@ -135,7 +141,7 @@ async function start() {
     await ChangeBookPublicationById(Library, 8344, 'Jack Smith');
     console.table(await displayAllBooks(Library));
   } catch (e) {
-    console.log(e);
+    console.log('Unable to Connect to the mongoDB');
   } finally {
     client.close();
   }
