@@ -29,7 +29,6 @@
     "nyc": "^15.1.0"
   },
   "dependencies": {
-    "mongodb": "^6.3.0",
     "mongoose": "^8.1.3"
   }
 }
