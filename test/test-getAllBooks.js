@@ -42,21 +42,28 @@ const populate = async () => {
 };
 const expectedoutputIds = ['1234', '1235', '1236', '5678'];
 describe('getAllBooks test', ()=> {
-  before(async () => {
-    await connectToMongoDB(URIs.testURI.uri);
-    await populate();
-  });
-  it(`should return ${expectedoutputIds?
-      'books with ID ['+expectedoutputIds.join(', ') + ']':
-      'null'}`, async ()=> {
-    const books = await getAllBooks();
-    assert.strictEqual(books.length, expectedoutputIds.length);
-    books.forEach((book)=>{
-      assert.ok(expectedoutputIds.includes(book.bookId));
+  describe('Test with mongoDB connection', ()=> {
+    before(async () => {
+      await connectToMongoDB(URIs.testURI.uri);
+      await populate();
+    });
+    it(`should return ${expectedoutputIds?
+        'books with ID ['+expectedoutputIds.join(', ') + ']':
+        'null'}`, async ()=> {
+      const books = await getAllBooks();
+      assert.strictEqual(books.length, expectedoutputIds.length);
+      books.forEach((book)=>{
+        assert.ok(expectedoutputIds.includes(book.bookId));
+      });
+    });
+    after(async () => {
+      await mongoose.connection.db.dropDatabase();
+      await closeConnection();
     });
   });
-  after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await closeConnection();
+  describe('Test without mongoDB connection', () => {
+    it(`should return 'null'`, async ()=> {
+      assert.strictEqual(await getAllBooks(), null);
+    });
   });
 });

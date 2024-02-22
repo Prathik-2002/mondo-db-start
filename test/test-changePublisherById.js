@@ -47,25 +47,40 @@ const changePublisherByIdTestCases = [
     newPublisher: 'JAmes',
     expectedresult: false,
   },
+  {
+    id: '1235',
+    newPublisher: 'Kim J',
+    expectedresult: true,
+  },
 ];
 describe('Change Publisher By Id test', ()=>{
-  before(async () => {
-    await connectToMongoDB(URIs.testURI.uri);
-    await populate();
-  });
-  changePublisherByIdTestCases.forEach((testcase) => {
-    it(`should return ${testcase
-        .expectedresult} for publisher change bookid ${testcase.id} `, async ()=>{
-      assert.strictEqual(await changePublisherById(testcase.id,
-          testcase.newPublisher), testcase.expectedresult);
-      if (testcase.expectedresult === true) {
-        const book = await Book.findOne({bookId: testcase.id}, {publisher: 1});
-        assert.strictEqual(book?book.publisher:null, testcase.newPublisher);
-      }
+  describe('Test with mongoDB connection', () => {
+    before(async () => {
+      await connectToMongoDB(URIs.testURI.uri);
+      await populate();
+    });
+    changePublisherByIdTestCases.forEach((testcase) => {
+      it(`should return ${testcase
+          .expectedresult} for publisher change bookid ${testcase.id} `, async ()=>{
+        assert.strictEqual(await changePublisherById(testcase.id,
+            testcase.newPublisher), testcase.expectedresult);
+        if (testcase.expectedresult === true) {
+          const book = await Book.findOne({bookId: testcase.id}, {publisher: 1});
+          assert.strictEqual(book?book.publisher:null, testcase.newPublisher);
+        }
+      });
+    });
+    after(async () => {
+      await mongoose.connection.db.dropDatabase();
+      await closeConnection();
     });
   });
-  after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await closeConnection();
+  describe('Test without mongoDB connection', () => {
+    changePublisherByIdTestCases.forEach((testcase) => {
+      it(`should return ${false} for publisher change bookid ${testcase.id} `, async ()=>{
+        assert.strictEqual(await changePublisherById(testcase.id,
+            testcase.newPublisher), false);
+      });
+    });
   });
 });

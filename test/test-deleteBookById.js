@@ -47,18 +47,27 @@ const populate = async () => {
   );
 };
 describe('Delete Books By Id test', ()=>{
-  before(async () => {
-    await connectToMongoDB(URIs.testURI.uri);
-    await populate();
-  });
-  deleteBookByIdTestcases.forEach((testcase) => {
-    it(`should return ${testcase.output} for id ${testcase.input}`, async ()=>{
-      assert.strictEqual(await deleteBookById(testcase.input), testcase.output);
-      assert.strictEqual(await Book.exists({bookId: testcase.input}), null);
+  describe('Test with mongodb connection', ()=>{
+    before(async () => {
+      await connectToMongoDB(URIs.testURI.uri);
+      await populate();
+    });
+    deleteBookByIdTestcases.forEach((testcase) => {
+      it(`should return ${testcase.output} for id ${testcase.input}`, async ()=>{
+        assert.strictEqual(await deleteBookById(testcase.input), testcase.output);
+        assert.strictEqual(await Book.exists({bookId: testcase.input}), null);
+      });
+    });
+    after(async () => {
+      await mongoose.connection.db.dropDatabase();
+      await closeConnection();
     });
   });
-  after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await closeConnection();
+  describe('Test without mongodb connection', ()=>{
+    deleteBookByIdTestcases.forEach((testcase) => {
+      it(`should return ${false} for id ${testcase.input}`, async ()=>{
+        assert.strictEqual(await deleteBookById(testcase.input), false);
+      });
+    });
   });
 });

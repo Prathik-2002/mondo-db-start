@@ -76,15 +76,6 @@ const getBookByAuthor = async (author) => {
     return null;
   }
 };
-const incrementBookAgeById = async (id) => {
-  try {
-    await Book.updateOne({bookId: id}, {$inc: {age: 1}});
-    return true;
-  } catch (err) {
-    console.log('unable to increment');
-    return false;
-  }
-};
 
 module.exports = {
   connectToMongoDB,
@@ -93,6 +84,5 @@ module.exports = {
   getAllBooks,
   getBookByAuthor,
   changePublisherById,
-  incrementBookAgeById,
   deleteBookById,
 };

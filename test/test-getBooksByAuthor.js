@@ -52,23 +52,32 @@ const populate = async () => {
   );
 };
 describe('getBookByAuthorName test', ()=> {
-  before(async () => {
-    await connectToMongoDB(URIs.testURI.uri);
-    await populate();
-  });
-  getBookByAuthorTestCases.forEach((testcase)=>{
-    it(`should return ${testcase.output?
-      'books with ID ['+testcase.output.join(', ') + ']':
-      'null'} for input ${testcase.input}`, async ()=> {
-      const books = await getBookByAuthor(testcase.input);
-      assert.strictEqual(books.length, testcase['output'].length);
-      books.forEach((book)=>{
-        assert.ok(testcase.output.includes(book.bookId));
+  describe('Test with mongoDB connection', ()=> {
+    before(async () => {
+      await connectToMongoDB(URIs.testURI.uri);
+      await populate();
+    });
+    getBookByAuthorTestCases.forEach((testcase)=>{
+      it(`should return ${testcase.output?
+        'books with ID ['+testcase.output.join(', ') + ']':
+        'null'} for input ${testcase.input}`, async ()=> {
+        const books = await getBookByAuthor(testcase.input);
+        assert.strictEqual(books.length, testcase['output'].length);
+        books.forEach((book)=>{
+          assert.ok(testcase.output.includes(book.bookId));
+        });
       });
     });
+    after(async () => {
+      await mongoose.connection.db.dropDatabase();
+      await closeConnection();
+    });
   });
-  after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await closeConnection();
+  describe('Test without MongoDB Connection', () => {
+    getBookByAuthorTestCases.forEach((testcase)=>{
+      it(`should return null}`, async ()=> {
+        assert.strictEqual(await getBookByAuthor(testcase.input), null);
+      });
+    });
   });
 });
