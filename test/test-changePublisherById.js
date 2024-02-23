@@ -66,7 +66,7 @@ describe('Change Publisher By Id test', ()=>{
             testcase.newPublisher), testcase.expectedresult);
         if (testcase.expectedresult === true) {
           const book = await Book.findOne({bookId: testcase.id}, {publisher: 1});
-          assert.strictEqual(book?book.publisher:null, testcase.newPublisher);
+          assert.strictEqual(book.publisher, testcase.newPublisher);
         }
       });
     });

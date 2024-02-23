@@ -47,9 +47,7 @@ describe('getAllBooks test', ()=> {
       await connectToMongoDB(URIs.testURI.uri);
       await populate();
     });
-    it(`should return ${expectedoutputIds?
-        'books with ID ['+expectedoutputIds.join(', ') + ']':
-        'null'}`, async ()=> {
+    it(`should return ${expectedoutputIds.join(', ')}`, async ()=> {
       const books = await getAllBooks();
       assert.strictEqual(books.length, expectedoutputIds.length);
       books.forEach((book)=>{
@@ -61,8 +59,12 @@ describe('getAllBooks test', ()=> {
       await closeConnection();
     });
   });
-  describe('Test without mongoDB connection', () => {
-    it(`should return 'null'`, async ()=> {
+  describe('Test with invalid mongoDB connection', () => {
+    before(async () => {
+      await connectToMongoDB(URIs.invalidURI.uri);
+      await populate();
+    });
+    it(`should return 'null' when mongo connection is made with invalid uri`, async ()=> {
       assert.strictEqual(await getAllBooks(), null);
     });
   });

@@ -6,13 +6,11 @@ const connectToMongoDB =async (URI) => {
     await mongoose.connect(URI);
     return true;
   } catch (err) {
-    console.log('Unable to connect');
     return false;
   }
 };
 const closeConnection = async () => {
   await mongoose.disconnect();
-  console.log('Connection closed');
 };
 const addNewBook = async (id, name, author, pages, genre, publisher, age) => {
   try {
@@ -41,7 +39,6 @@ const changePublisherById = async (id, newPublisher) => {
     await Book.updateMany({bookId: id}, {$set: {publisher: newPublisher}});
     return true;
   } catch (err) {
-    console.log('Update failed');
     return false;
   }
 };
@@ -54,7 +51,6 @@ const deleteBookById = async (id) => {
     await Book.deleteMany().where('bookId').equals(id);
     return true;
   } catch (err) {
-    console.log('Delete failed');
     return false;
   }
 };
@@ -63,7 +59,6 @@ const getAllBooks = async () => {
     const books = await Book.find();
     return books;
   } catch (err) {
-    console.log('Failed to get all books');
     return null;
   }
 };
@@ -72,7 +67,6 @@ const getBookByAuthor = async (author) => {
     const books = await Book.find().where('author').equals(author);
     return books;
   } catch (err) {
-    console.log('Unable to get Book');
     return null;
   }
 };

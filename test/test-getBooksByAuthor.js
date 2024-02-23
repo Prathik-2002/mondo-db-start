@@ -58,9 +58,8 @@ describe('getBookByAuthorName test', ()=> {
       await populate();
     });
     getBookByAuthorTestCases.forEach((testcase)=>{
-      it(`should return ${testcase.output?
-        'books with ID ['+testcase.output.join(', ') + ']':
-        'null'} for input ${testcase.input}`, async ()=> {
+      it(`should return
+        'books with ID [ ${testcase.output.join(', ')} for input ${testcase.input}`, async ()=> {
         const books = await getBookByAuthor(testcase.input);
         assert.strictEqual(books.length, testcase['output'].length);
         books.forEach((book)=>{
@@ -73,7 +72,11 @@ describe('getBookByAuthorName test', ()=> {
       await closeConnection();
     });
   });
-  describe('Test without MongoDB Connection', () => {
+  describe('Test with invalid MongoDB Connection', () => {
+    before(async () => {
+      await connectToMongoDB(URIs.invalidURI.uri);
+      await populate();
+    });
     getBookByAuthorTestCases.forEach((testcase)=>{
       it(`should return null}`, async ()=> {
         assert.strictEqual(await getBookByAuthor(testcase.input), null);
