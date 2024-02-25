@@ -17,6 +17,7 @@ const addNewBookTestCases = [
       3,
     ],
     result: true,
+    isExist: true,
   },
   {
     functionArguments: [
@@ -29,6 +30,46 @@ const addNewBookTestCases = [
       3,
     ],
     result: true,
+    isExist: true,
+  },
+  {
+    functionArguments: [
+      '1119',
+      null,
+      'Rudyard Kipling',
+      '409',
+      ['Adventure', 'Fiction'],
+      'Macmillan',
+      3,
+    ],
+    isExist: false,
+    result: false,
+  },
+  {
+    functionArguments: [
+      null,
+      'The Jungle book',
+      'Rudyard Kipling',
+      '409',
+      ['Adventure', 'Fiction'],
+      'Macmillan',
+      3,
+    ],
+    isExist: false,
+    result: false,
+  },
+  {
+    functionArguments: [
+      '2213',
+      'The Jungle book',
+      null,
+      '409',
+      ['Adventure', 'Fiction'],
+      'Macmillan',
+      3,
+    ],
+    isExist: false,
+    result: false,
   },
   {
     functionArguments: [
@@ -40,18 +81,20 @@ const addNewBookTestCases = [
       'Simon & Schuster',
       9,
     ],
+    isExist: true,
     result: true,
   },
   {
     functionArguments: [
       '1113',
-      'Pennywise',
+      'Pennywise 2',
       'Stephan King',
       '489',
       ['Horror', 'Thriller'],
       'Simon & Schuster',
       9,
     ],
+    isExist: false,
     result: false,
   },
 ];
@@ -67,7 +110,13 @@ describe('AddNewBook test', ()=>{
         .join(', '))}]`,
     async ()=>{
       assert.strictEqual(await addNewBook(...(testcase.functionArguments)), testcase.result);
-      assert.notStrictEqual(await Book.exists({bookId: testcase.functionArguments[0]}), null);
+      if (testcase.isExist) {
+        assert.notStrictEqual(await Book.exists({bookId: testcase.functionArguments[0],
+          bookName: testcase.functionArguments[1]}), null);
+      } else {
+        assert.strictEqual(await Book.exists({bookId: testcase.functionArguments[0],
+          bookName: testcase.functionArguments[1]}), null);
+      }
     });
   });
   after(async () => {

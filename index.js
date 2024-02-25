@@ -12,7 +12,6 @@ const addNewBook = async (id, name, author, pages, genre, publisher, age) => {
     });
     return true;
   } catch (err) {
-    console.log('Insertion failed');
     return false;
   }
 };
@@ -21,7 +20,7 @@ const changePublisherById = async (id, newPublisher) => {
   try {
     const isExists = await Book.exists({bookId: id});
     if (isExists === null) {
-      throw new 'Book does not exist';
+      return false;
     }
     await Book.updateMany({bookId: id}, {$set: {publisher: newPublisher}});
     return true;
@@ -33,7 +32,7 @@ const deleteBookById = async (id) => {
   try {
     const isExists = await Book.exists({bookId: id});
     if (isExists === null) {
-      throw new 'Book does not exist';
+      return false;
     }
     await Book.deleteMany().where('bookId').equals(id);
     return true;
