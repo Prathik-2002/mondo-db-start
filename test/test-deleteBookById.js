@@ -2,12 +2,10 @@ const mongoose = require('mongoose');
 const assert = require('assert');
 const Book = require('../schema');
 
-const {addNewBook, deleteBookById, closeConnection, connectToMongoDB} = require('../index');
-const URIs = {
-  validURI: {uri: 'mongodb://localhost/Demo', connectionResult: true},
-  invalidURI: {uri: 'mongod://localhost/Demo', connectionResult: false},
-  testURI: {uri: 'mongodb://localhost/Test', connectionResult: true},
-};
+const {addNewBook, deleteBookById} = require('../index');
+const {MongoMemoryServer} = require('mongodb-memory-server');
+let mongoServer;
+
 const deleteBookByIdTestcases = [
   {input: '1234', output: true},
   {input: '1333', output: false},
@@ -49,7 +47,9 @@ const populate = async () => {
 describe('Delete Books By Id test', ()=>{
   describe('Test with mongodb connection', ()=>{
     before(async () => {
-      await connectToMongoDB(URIs.testURI.uri);
+      mongoServer = await MongoMemoryServer.create();
+      const uri = await mongoServer.getUri();
+      await mongoose.connect(uri);
       await populate();
     });
     deleteBookByIdTestcases.forEach((testcase) => {
@@ -59,8 +59,8 @@ describe('Delete Books By Id test', ()=>{
       });
     });
     after(async () => {
-      await mongoose.connection.db.dropDatabase();
-      await closeConnection();
+      await mongoose.disconnect();
+      await mongoServer.stop();
     });
   });
   describe('Test without mongodb connection', ()=>{

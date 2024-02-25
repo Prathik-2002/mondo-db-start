@@ -1,13 +1,9 @@
 const mongoose = require('mongoose');
 const assert = require('assert');
 const Book = require('../schema');
-
-const {addNewBook, closeConnection, connectToMongoDB} = require('../index');
-const URIs = {
-  validURI: {uri: 'mongodb://localhost/Demo', connectionResult: true},
-  invalidURI: {uri: 'mongod://localhost/Demo', connectionResult: false},
-  testURI: {uri: 'mongodb://localhost/Test', connectionResult: true},
-};
+const {MongoMemoryServer} = require('mongodb-memory-server');
+const {addNewBook} = require('../index');
+let mongoServer;
 
 const addNewBookTestCases = [
   {
@@ -61,7 +57,9 @@ const addNewBookTestCases = [
 ];
 describe('AddNewBook test', ()=>{
   before(async () => {
-    await connectToMongoDB(URIs.testURI.uri);
+    mongoServer = await MongoMemoryServer.create();
+    const uri = await mongoServer.getUri();
+    await mongoose.connect(uri);
   });
   addNewBookTestCases.forEach((testcase) => {
     it(`should ${testcase.result?'':'not'} insert into collection for inputs [${(testcase
@@ -73,7 +71,7 @@ describe('AddNewBook test', ()=>{
     });
   });
   after(async () => {
-    await mongoose.connection.db.dropDatabase();
-    await closeConnection();
+    await mongoose.disconnect();
+    await mongoServer.stop();
   });
 });

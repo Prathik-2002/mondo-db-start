@@ -1,11 +1,8 @@
 const mongoose = require('mongoose');
 const assert = require('assert');
-const {getBookByAuthor, addNewBook, closeConnection, connectToMongoDB} = require('../index');
-const URIs = {
-  validURI: {uri: 'mongodb://localhost/Demo', connectionResult: true},
-  invalidURI: {uri: 'mongod://localhost/Demo', connectionResult: false},
-  testURI: {uri: 'mongodb://localhost/Test', connectionResult: true},
-};
+const {getBookByAuthor, addNewBook} = require('../index');
+const {MongoMemoryServer} = require('mongodb-memory-server');
+let mongoServer;
 
 const getBookByAuthorTestCases = [
   {
@@ -54,7 +51,9 @@ const populate = async () => {
 describe('getBookByAuthorName test', ()=> {
   describe('Test with mongoDB connection', ()=> {
     before(async () => {
-      await connectToMongoDB(URIs.testURI.uri);
+      mongoServer = await MongoMemoryServer.create();
+      const uri = await mongoServer.getUri();
+      await mongoose.connect(uri);
       await populate();
     });
     getBookByAuthorTestCases.forEach((testcase)=>{
@@ -68,15 +67,11 @@ describe('getBookByAuthorName test', ()=> {
       });
     });
     after(async () => {
-      await mongoose.connection.db.dropDatabase();
-      await closeConnection();
+      await mongoose.disconnect();
+      await mongoServer.stop();
     });
   });
   describe('Test with invalid MongoDB Connection', () => {
-    before(async () => {
-      await connectToMongoDB(URIs.invalidURI.uri);
-      await populate();
-    });
     getBookByAuthorTestCases.forEach((testcase)=>{
       it(`should return null}`, async ()=> {
         assert.strictEqual(await getBookByAuthor(testcase.input), null);

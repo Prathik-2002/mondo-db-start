@@ -1,17 +1,4 @@
-const mongoose = require('mongoose');
 const Book = require('./schema');
-
-const connectToMongoDB =async (URI) => {
-  try {
-    await mongoose.connect(URI);
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
-const closeConnection = async () => {
-  await mongoose.disconnect();
-};
 const addNewBook = async (id, name, author, pages, genre, publisher, age) => {
   try {
     await Book.create({
@@ -72,8 +59,6 @@ const getBookByAuthor = async (author) => {
 };
 
 module.exports = {
-  connectToMongoDB,
-  closeConnection,
   addNewBook,
   getAllBooks,
   getBookByAuthor,

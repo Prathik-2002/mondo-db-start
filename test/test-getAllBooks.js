@@ -1,11 +1,8 @@
 const mongoose = require('mongoose');
 const assert = require('assert');
-const {addNewBook, closeConnection, connectToMongoDB, getAllBooks} = require('../index');
-const URIs = {
-  validURI: {uri: 'mongodb://localhost/Demo', connectionResult: true},
-  invalidURI: {uri: 'mongod://localhost/Demo', connectionResult: false},
-  testURI: {uri: 'mongodb://localhost/Test', connectionResult: true},
-};
+const {addNewBook, getAllBooks} = require('../index');
+const {MongoMemoryServer} = require('mongodb-memory-server');
+let mongoServer;
 const populate = async () => {
   await addNewBook('1234',
       'The Great Gatsby',
@@ -44,7 +41,9 @@ const expectedoutputIds = ['1234', '1235', '1236', '5678'];
 describe('getAllBooks test', ()=> {
   describe('Test with mongoDB connection', ()=> {
     before(async () => {
-      await connectToMongoDB(URIs.testURI.uri);
+      mongoServer = await MongoMemoryServer.create();
+      const uri = await mongoServer.getUri();
+      await mongoose.connect(uri);
       await populate();
     });
     it(`should return ${expectedoutputIds.join(', ')}`, async ()=> {
@@ -55,15 +54,11 @@ describe('getAllBooks test', ()=> {
       });
     });
     after(async () => {
-      await mongoose.connection.db.dropDatabase();
-      await closeConnection();
+      await mongoose.disconnect();
+      await mongoServer.stop();
     });
   });
   describe('Test with invalid mongoDB connection', () => {
-    before(async () => {
-      await connectToMongoDB(URIs.invalidURI.uri);
-      await populate();
-    });
     it(`should return 'null' when mongo connection is made with invalid uri`, async ()=> {
       assert.strictEqual(await getAllBooks(), null);
     });
