@@ -58,7 +58,7 @@ describe('getAllBooks test', ()=> {
       await mongoServer.stop();
     });
   });
-  describe('Test with invalid mongoDB connection', () => {
+  describe('Test without mongoDB connection', () => {
     it(`should return 'null' when mongo connection is made with invalid uri`, async ()=> {
       assert.strictEqual(await getAllBooks(), null);
     });

@@ -71,7 +71,7 @@ describe('getBookByAuthorName test', ()=> {
       await mongoServer.stop();
     });
   });
-  describe('Test with invalid MongoDB Connection', () => {
+  describe('Test without MongoDB Connection', () => {
     getBookByAuthorTestCases.forEach((testcase)=>{
       it(`should return null}`, async ()=> {
         assert.strictEqual(await getBookByAuthor(testcase.input), null);
