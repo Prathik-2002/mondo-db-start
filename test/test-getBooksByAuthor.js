@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const assert = require('assert');
-const {getBookByAuthor, closeConnection, connectToMongoDB} = require('../index');
-const {populate} = require('./polulate');
+const {getBookByAuthor, addNewBook, closeConnection, connectToMongoDB} = require('../index');
 const URIs = {
   validURI: {uri: 'mongodb://localhost/Demo', connectionResult: true},
   invalidURI: {uri: 'mongod://localhost/Demo', connectionResult: false},
@@ -18,7 +17,40 @@ const getBookByAuthorTestCases = [
     output: [],
   },
 ];
-
+const populate = async () => {
+  await addNewBook('1234',
+      'The Great Gatsby',
+      'F. Scott Fitzgerald',
+      180,
+      ['Fiction', 'Classics'],
+      'Scribner',
+      18,
+  );
+  await addNewBook('1235',
+      'The Great Gatsby',
+      'F. Scott Fitzgerald',
+      180,
+      ['Fiction', 'Classics'],
+      'Scribner',
+      18,
+  );
+  await addNewBook('1236',
+      'The Great Gatsby',
+      'F. Scott Fitzgerald',
+      180,
+      ['Fiction', 'Classics'],
+      'Scribner',
+      18,
+  );
+  await addNewBook('5678',
+      'Pride and Prejudice',
+      'Jane Austen',
+      279,
+      ['Fiction', 'Romance', 'Classics'],
+      'T. Egerton, Whitehall',
+      16,
+  );
+};
 describe('getBookByAuthorName test', ()=> {
   describe('Test with mongoDB connection', ()=> {
     before(async () => {
