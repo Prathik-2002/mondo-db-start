@@ -1,4 +1,11 @@
 const Book = require('./schema');
+const isExist = async (id) => {
+  const isExists = await Book.exists({bookId: id});
+  if (isExists === null) {
+    return false;
+  }
+  return true;
+};
 const addNewBook = async (id, name, author, pages, genre, publisher, age) => {
   try {
     await Book.create({
@@ -18,8 +25,7 @@ const addNewBook = async (id, name, author, pages, genre, publisher, age) => {
 
 const changePublisherById = async (id, newPublisher) => {
   try {
-    const isExists = await Book.exists({bookId: id});
-    if (isExists === null) {
+    if (!await isExist(id)) {
       return false;
     }
     await Book.updateMany({bookId: id}, {$set: {publisher: newPublisher}});
@@ -30,12 +36,11 @@ const changePublisherById = async (id, newPublisher) => {
 };
 const deleteBookById = async (id) => {
   try {
-    const isExists = await Book.exists({bookId: id});
-    if (isExists === null) {
-      return false;
+    if (await isExist(id)) {
+      await Book.deleteMany().where('bookId').equals(id);
+      return true;
     }
-    await Book.deleteMany().where('bookId').equals(id);
-    return true;
+    return false;
   } catch (err) {
     return false;
   }

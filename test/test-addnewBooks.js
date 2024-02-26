@@ -1,9 +1,6 @@
-const mongoose = require('mongoose');
 const assert = require('assert');
 const Book = require('../schema');
-const {MongoMemoryServer} = require('mongodb-memory-server');
 const {addNewBook} = require('../index');
-let mongoServer;
 
 const addNewBookTestCases = [
   {
@@ -98,29 +95,32 @@ const addNewBookTestCases = [
     result: false,
   },
 ];
-describe('AddNewBook test', ()=>{
-  before(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = await mongoServer.getUri();
-    await mongoose.connect(uri);
-  });
-  addNewBookTestCases.forEach((testcase) => {
-    it(`should ${testcase.result?'':'not'} insert into collection for inputs [${(testcase
-        .functionArguments
-        .join(', '))}]`,
-    async ()=>{
-      assert.strictEqual(await addNewBook(...(testcase.functionArguments)), testcase.result);
-      if (testcase.isExist) {
-        assert.notStrictEqual(await Book.exists({bookId: testcase.functionArguments[0],
-          bookName: testcase.functionArguments[1]}), null);
-      } else {
-        assert.strictEqual(await Book.exists({bookId: testcase.functionArguments[0],
-          bookName: testcase.functionArguments[1]}), null);
-      }
+const addNewBookTestDesign = {
+  functionName: 'addNewBook',
+  populate: false,
+  withConnection: () => {
+    addNewBookTestCases.forEach((testcase) => {
+      it(`should ${testcase.result?'':'not'} insert into collection for inputs [${(testcase
+          .functionArguments
+          .join(', '))}]`,
+      async ()=>{
+        assert.strictEqual(await addNewBook(...(testcase.functionArguments)), testcase.result);
+        if (testcase.isExist) {
+          assert.notStrictEqual(await Book.exists({bookId: testcase.functionArguments[0],
+            bookName: testcase.functionArguments[1]}), null);
+        } else {
+          assert.strictEqual(await Book.exists({bookId: testcase.functionArguments[0],
+            bookName: testcase.functionArguments[1]}), null);
+        }
+      });
     });
-  });
-  after(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
-  });
-});
+  },
+  withoutConnection: () => {
+    addNewBookTestCases.forEach((testcase) => {
+      it(`should return ${false} any insertion`, async ()=>{
+        assert.strictEqual(await addNewBook(...(testcase.functionArguments)), false);
+      });
+    });
+  },
+};
+module.exports = {addNewBookTestDesign};

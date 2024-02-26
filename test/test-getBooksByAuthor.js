@@ -1,8 +1,5 @@
-const mongoose = require('mongoose');
 const assert = require('assert');
-const {getBookByAuthor, addNewBook} = require('../index');
-const {MongoMemoryServer} = require('mongodb-memory-server');
-let mongoServer;
+const {getBookByAuthor} = require('../index');
 
 const getBookByAuthorTestCases = [
   {
@@ -14,48 +11,10 @@ const getBookByAuthorTestCases = [
     output: [],
   },
 ];
-const populate = async () => {
-  await addNewBook('1234',
-      'The Great Gatsby',
-      'F. Scott Fitzgerald',
-      180,
-      ['Fiction', 'Classics'],
-      'Scribner',
-      18,
-  );
-  await addNewBook('1235',
-      'The Great Gatsby',
-      'F. Scott Fitzgerald',
-      180,
-      ['Fiction', 'Classics'],
-      'Scribner',
-      18,
-  );
-  await addNewBook('1236',
-      'The Great Gatsby',
-      'F. Scott Fitzgerald',
-      180,
-      ['Fiction', 'Classics'],
-      'Scribner',
-      18,
-  );
-  await addNewBook('5678',
-      'Pride and Prejudice',
-      'Jane Austen',
-      279,
-      ['Fiction', 'Romance', 'Classics'],
-      'T. Egerton, Whitehall',
-      16,
-  );
-};
-describe('getBookByAuthorName test', ()=> {
-  describe('Test with mongoDB connection', ()=> {
-    before(async () => {
-      mongoServer = await MongoMemoryServer.create();
-      const uri = await mongoServer.getUri();
-      await mongoose.connect(uri);
-      await populate();
-    });
+const getBookByAuthorTestDesign = {
+  functionName: 'getBookByAuthor',
+  populate: true,
+  withConnection: () => {
     getBookByAuthorTestCases.forEach((testcase)=>{
       it(`should return
         'books with ID [ ${testcase.output.join(', ')} for input ${testcase.input}`, async ()=> {
@@ -66,16 +25,14 @@ describe('getBookByAuthorName test', ()=> {
         });
       });
     });
-    after(async () => {
-      await mongoose.disconnect();
-      await mongoServer.stop();
-    });
-  });
-  describe('Test without MongoDB Connection', () => {
+  },
+  withoutConnection: () => {
     getBookByAuthorTestCases.forEach((testcase)=>{
       it(`should return null}`, async ()=> {
         assert.strictEqual(await getBookByAuthor(testcase.input), null);
       });
     });
-  });
-});
+  },
+};
+module.exports = {getBookByAuthorTestDesign, getBookByAuthorTestCases};
+
