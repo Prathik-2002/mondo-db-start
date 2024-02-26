@@ -20,7 +20,7 @@ const addNewBookTestCases = [
     functionArguments: [
       '1112',
       'The Jungle book',
-      'Rudyard Kipling',
+      'Rudyar Kipling',
       '409',
       ['Adventure', 'Fiction'],
       'Macmillan',
@@ -33,7 +33,7 @@ const addNewBookTestCases = [
     functionArguments: [
       '1119',
       null,
-      'Rudyard Kipling',
+      'Rudyrd Kipling',
       '409',
       ['Adventure', 'Fiction'],
       'Macmillan',
@@ -46,7 +46,7 @@ const addNewBookTestCases = [
     functionArguments: [
       null,
       'The Jungle book',
-      'Rudyard Kipling',
+      'Rudyard Kiping',
       '409',
       ['Adventure', 'Fiction'],
       'Macmillan',
@@ -105,12 +105,12 @@ const addNewBookTestDesign = {
           .join(', '))}]`,
       async ()=>{
         assert.strictEqual(await addNewBook(...(testcase.functionArguments)), testcase.result);
+        const isExists = await Book.exists({bookId: testcase.functionArguments[0],
+          bookName: testcase.functionArguments[1]});
         if (testcase.isExist) {
-          assert.notStrictEqual(await Book.exists({bookId: testcase.functionArguments[0],
-            bookName: testcase.functionArguments[1]}), null);
+          assert.notStrictEqual(isExists, null);
         } else {
-          assert.strictEqual(await Book.exists({bookId: testcase.functionArguments[0],
-            bookName: testcase.functionArguments[1]}), null);
+          assert.strictEqual(isExists, null);
         }
       });
     });

@@ -68,4 +68,5 @@ module.exports = {
   getBookByAuthor,
   changePublisherById,
   deleteBookById,
+  isExist,
 };
