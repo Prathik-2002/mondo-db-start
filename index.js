@@ -28,7 +28,7 @@ const changePublisherById = async (id, newPublisher) => {
     if (!await isExist(id)) {
       return false;
     }
-    await Book.findByIdAndUpdate(id, {publisher: newPublisher});
+    await Book.find({bookId: id}).updateOne({publisher: newPublisher});
     return true;
   } catch (err) {
     return false;

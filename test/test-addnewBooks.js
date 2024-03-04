@@ -1,4 +1,5 @@
 const assert = require('assert');
+const {expect} = require('chai');
 const Book = require('../schema');
 const {addNewBook} = require('../index');
 
@@ -98,12 +99,13 @@ const addNewBookTestDesign = {
           .join(', '))}]`,
       async ()=>{
         assert.strictEqual(await addNewBook(...(testcase.functionArguments)), testcase.result);
-        const isExists = await Book.exists({bookId: testcase.functionArguments[0],
+        const isExists = await Book.exists({
+          bookId: testcase.functionArguments[0],
           bookName: testcase.functionArguments[1]});
         if (testcase.result) {
-          assert.notStrictEqual(isExists, null);
+          expect(isExists).to.not.be.null;
         } else {
-          assert.strictEqual(isExists, null);
+          expect(isExists).to.be.null;
         }
       });
     });
