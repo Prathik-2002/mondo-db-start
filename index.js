@@ -28,7 +28,7 @@ const changePublisherById = async (id, newPublisher) => {
     if (!await isExist(id)) {
       return false;
     }
-    await Book.updateMany({bookId: id}, {$set: {publisher: newPublisher}});
+    await Book.findByIdAndUpdate(id, {publisher: newPublisher});
     return true;
   } catch (err) {
     return false;
